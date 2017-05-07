@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax</title>
+    <!--
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui"></script>
+    -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js"></script>
+    <script src="http://cdn.datatables.net/responsive/2.0.2/js/dataTables.responsive.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="/static/js/data_table_editor.free.js"></script>
+    <!-- css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.1.2/css/select.dataTables.min.css">
+    <link rel="stylesheet" href="http://cdn.datatables.net/responsive/2.0.2/css/responsive.dataTables.min.css">
+    <script>
+        $(document).ready(function () {
+            $('#test_text').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url_for('get_post') }}",
+                    data: JSON.stringify({ 'username': $('#name').val(), 'content': $('#cont').val() }),
+                    contentType: "application/json;charset=utf-8",
+                    success: function (result) {
+                        var msg = result.msg;
+                        alert(msg);
+                        $('#msg2').text('jquery work!');
+                    }
+                });
+            });
+
+            $('#test_file').click(function () {
+                var options = {
+                    type: "POST",
+                    url: 'upload',
+                    success: function (data) {
+                        dataSet = data.data;
+                        alert(data.msg);
+                        $("#msg3").text('upload success.');
+                    },
+                    error: function (XmlHttpRequest, textStatus, errorThorwn) {
+                        alert('server error,try again.');
+                    }
+                };
+                $("form[name=fileform]").ajaxSubmit(options);
+            });
+
+            var columnDefs = [{
+                title: 'Name'
+            },{
+                title: 'Position'
+            },{
+                title: 'Salary'
+            }];
+
+            var myTable;
+            var dataSet = [];
+            myTable = $('#example').DataTable({
+                "sPaginationType": "full_numbers",
+                data:dataSet,
+                columns: columnDefs,
+                dom: 'Bfrtip',        // Needs button container
+                select: 'single',
+                responsive: true,
+                altEditor: true,     // Enable altEditor
+                buttons: [{
+                    text: 'Add',
+                    name: 'add'        // do not change name
+                },
+                    {
+                        extend: 'selected', // Bind to Selected row
+                        text: 'Edit',
+                        name: 'edit'        // do not change name
+                    },
+                    {
+                        extend: 'selected', // Bind to Selected row
+                        text: 'Delete',
+                        name: 'delete'      // do not change name
+                    }]
+            });
+        })
+    </script>
+
+    <style>
+        table.dataTable tbody>tr.selected,
+        table.dataTable tbody>tr>.selected {
+            background-color: #A2D3F6;
+        }
+    </style>
+</head>
+<body>
+<p><h3>Test text</h3></p>
+<p>name:<input type="text" name="" id="name"></p>
+<p>content:<textarea id="cont"></textarea></p>
+<button id="test_text">push it</button>
+<hr>
+<h3>disscussed</h3>
+<div id="msg"></div>
+<div id="msg2"></div>
+<hr>
+<p><h3>Test file</h3></p>
+<div id="uploadfile">
+    <form method=post enctype=multipart/form-data name="fileForm">
+        <input type="file" name=file>
+        <button id="test_file">parse excel</button>
+    </form>
+    <span id="msg3"></span>
+</div>
+<div class="container">
+    <table id="example" cellpadding="0" cellspacing="0" border="0" class="dataTable table table-striped"></table>
+</div>
+<hr>
+</body>
+</html>

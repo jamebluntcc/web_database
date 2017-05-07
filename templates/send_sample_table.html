@@ -1,0 +1,88 @@
+{% extends 'base_table.html' %}
+{% block title %}送样信息表{% endblock %}
+
+{% block table_js_init %}
+<script>
+    $(function () {
+        var dg = $('#dg').datagrid({
+            queryParams:{
+                name: 'send_sample_table'
+            }
+          });
+        dg.datagrid('enableFilter',[{
+            filterBtnIconCls:'icon-filter',
+            field: 'sample_number',
+            type: 'numberbox',
+            options: { precision: 2 },
+            op: ['equal', 'notequal', 'less', 'greater']
+        }]);
+    })
+</script>
+{% endblock %}
+
+{% block table_html_init %}
+<table id="dg" title="送样信息表" class="easyui-datagrid"
+       url="/show_data"
+       toolbar="#toolbar" pagination="true"
+       rownumbers="true" fitColumns="true" singleSelect="true">
+    <thead>
+    <tr>
+        <th field="id" width="50" align="center">序号</th>
+        <th field="project_id" width="50" align="center">项目编号</th>
+        <th field="sample_name" width="50" align="center" sortable="true">样品名称</th>
+        <th field="species" width="50" align="center">物种</th>
+        <th field="extract_part" width="50" align="center">提取部位</th>
+        <th field="sample_number" width="50" align="center">管数</th>
+        <th field="comment" width="100" align="center">备注</th>
+        <th field="time" width="150" align="center" sortable="true">时间</th>
+    </tr>
+    </thead>
+</table>
+{% endblock %}
+
+{% block tablename %}送样信息表{% endblock %}
+
+{% block table_form %}
+<form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+    <div style="margin-bottom:20px;font-size:14px;border-bottom:1px solid #ccc">样品信息</div>
+    <div style="margin-bottom:10px">
+        <input name="id" class="easyui-textbox" required="true" label="序号:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="project_id" class="easyui-textbox" required="true" label="项目编号:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="sample_name" class="easyui-textbox" required="true" label="样品名称:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="species" class="easyui-textbox" required="true" label="物种:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="extract_part" class="easyui-textbox" required="true" label="提取部位:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="sample_number" class="easyui-textbox" required="true" label="管数:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="comment" class="easyui-textbox" required="true" label="备注:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="time" class="easyui-textbox" required="true" label="时间:" style="width:100%">
+    </div>
+</form>
+{% endblock %}
+
+{% block form %}
+<div id="uploadfile" style="float: left;width: 100px">
+    <form action="/upload_send_sample_table" method=post enctype=multipart/form-data>
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</div>
+<div class="input-projectid" style="float: right;width: 300px">
+    输入下载项目编号:<input id="project_id" type="text"/>
+    <button onclick='export_table_info()'>导出送样数据</button>
+</div>
+{% endblock %}
+
+{% block table_name %}var table_name = 'send_sample_table';{% endblock %}

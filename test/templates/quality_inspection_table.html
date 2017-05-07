@@ -1,0 +1,141 @@
+{% extends 'base_table.html' %}
+{% block title %}质检信息表{% endblock %}
+
+{% block table_js_init %}
+<script>
+    $(function () {
+        var dg = $('#dg').datagrid({
+            queryParams:{
+                name: 'quality_inspection_table'
+            }
+          });
+        dg.datagrid('enableFilter',[{
+            filterBtnIconCls:'icon-filter',
+            field: 'volume',
+            type: 'numberbox',
+            options: { precision: 2 },
+            op: ['equal', 'notequal', 'less', 'greater']
+        },{
+          filterBtnIconCls:'icon-filter',
+          field: 'concentration',
+          type: 'numberbox',
+          options: { precision: 2 },
+          op: ['equal', 'notequal', 'less', 'greater']
+        },{
+          filterBtnIconCls:'icon-filter',
+          field: 'quantum',
+          type: 'numberbox',
+          options: { precision: 2 },
+          op: ['equal', 'notequal', 'less', 'greater']
+        },{
+          field: 'od_260_or_280',
+          type: 'numberbox',
+          options: { precision: 2 },
+          op: ['equal', 'notequal', 'less', 'greater']
+        },{
+          field: 'od_260_or_230',
+          type: 'numberbox',
+          options: { precision: 2 },
+          op: ['equal', 'notequal', 'less', 'greater']
+        },{
+          field: '25S_or_18S',
+          type: 'numberbox',
+          options: { precision: 2 },
+          op: ['equal', 'notequal', 'less', 'greater']
+        },{
+          field: 'rin',
+          type: 'numberbox',
+          options: { precision: 2 },
+          op: ['equal', 'notequal', 'less', 'greater']
+        }]);
+    })
+</script>
+{% endblock %}
+
+{% block table_html_init %}
+<table id="dg" title="质检信息表" class="easyui-datagrid"
+       url="/show_data"
+       toolbar="#toolbar" pagination="true"
+       rownumbers="true" fitColumns="true" singleSelect="true">
+    <thead>
+    <tr>
+        <th field="project_id" width="150" align="center">项目编号</th>
+        <th field="sample_name" width="150" align="center" sortable="true">样品名称</th>
+        <th field="sample_id" width="150" align="center" sortable="true">样品编号</th>
+        <th field="volume" width="100" align="center">浓度</th>
+        <th field="concentration" width="100" align="center">体积</th>
+        <th field="quantum" width="100" align="center">总量</th>
+        <th field="od_260_or_280" width="100" align="center">OD260/280</th>
+        <th field="od_260_or_230" width="100" align="center">OD260/230</th>
+        <th field="25S_or_18S" width="100" align="center">25S/18S*</th>
+        <th field="rin" width="100" align="center">RIN</th>
+        <th field="judgeresult" width="100" align="center">判定结果</th>
+        <th field="comment" width="100" align="center">备注</th>
+        <th field="time" width="150" align="center" sortable="true">时间</th>
+    </tr>
+    </thead>
+</table>
+{% endblock %}
+
+{% block tablename %}质检信息表{% endblock %}
+
+{% block table_form %}
+<form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+    <div style="margin-bottom:20px;font-size:14px;border-bottom:1px solid #ccc">质检信息</div>
+    <div style="margin-bottom:10px">
+        <input name="project_id" class="easyui-textbox" required="true" label="项目编号:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="sample_name" class="easyui-textbox" required="true" label="样品名称:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="sample_id" class="easyui-textbox" required="true" label="样品编号:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="volume" class="easyui-textbox" required="true" label="浓度:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="concentration" class="easyui-textbox" required="true" label="体积:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="quantum" class="easyui-textbox" required="true" label="总量:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="od_260_or_280" class="easyui-textbox" required="true" label="OD260/280:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="od_260_or_230" class="easyui-textbox" required="true" label="OD260/230:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="25S_or_18S" class="easyui-textbox" required="true" label="25S/18S*:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="rin" class="easyui-textbox" required="true" label="RIN:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="judgeresult" class="easyui-textbox" required="true" label="判定结果:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="comment" class="easyui-textbox" required="true" label="备注:" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+        <input name="time" class="easyui-textbox" required="true" label="时间:" style="width:100%">
+    </div>
+</form>
+{% endblock %}
+
+{% block form %}
+<div id="uploadfile">
+    <form action="/upload_quality_inspection_table" method=post enctype=multipart/form-data>
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</div>
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning" style="color:red"><span>{{ message }}</span></div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block table_name %}var table_name = 'quality_inspection_table';{% endblock %}

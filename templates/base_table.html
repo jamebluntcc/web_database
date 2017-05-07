@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/icon.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/color.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/main.css">
+  <script type="text/javascript" src="/static/js/easyui/jquery-1.6.min.js"></script>
+  <script type="text/javascript" src="/static/js/easyui/easyui.min.js"></script>
+  <script type="text/javascript" src="/static/js/easyui/datagrid-filter.js"></script>
+  <style>
+      .icon-filter{
+          background: url("../static/img/filter.png") no-repeat center;
+      }
+  </style>
+  {% block table_js_init %}
+  {% endblock %}
+</head>
+<body>
+  <h1>{% block tablename %}{% endblock %}</h1>
+  {% block table_html_init %}
+  {% endblock %}
+  <div id="toolbar">
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newSample()">新增样品</a>
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editSample()">编辑样品</a>
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroySample()">删除样品</a>
+  </div>
+  <div id="dlg" class="easyui-dialog" style="width:400px" closed="true" buttons="#dlg-buttons">
+    {% block table_form %}
+    {% endblock %}
+  </div>
+
+  <div id="dlg-buttons">
+      <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveSample()" style="width:90px">保存</a>
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
+  </div>
+{% block form %}
+{% endblock %}
+  <div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning" style="color:red"><span>{{ message }}</span></div>
+    {% endfor %}
+  </div>
+</body>
+<script type="text/javascript">
+    {% block table_name %}{% endblock %}
+    function export_table_info() {
+        $.get('/down_table_file', {table_name:table_name,project_id:$('#project_id').val()}, function (filename) {
+            window.location.href = '/static/export/' + filename
+        });
+    }
+    function newSample(){
+        $('#dlg').dialog('open').dialog('center').dialog('setTitle','新样品');
+        $('#fm').form('clear');
+        //url = '/save_sample';
+    }
+    function editSample(){
+        var row = $('#dg').datagrid('getSelected');
+        if (row){
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle','编辑样品');
+            $('#fm').form('load',row);
+            //url = 'update_sample.php?id='+row.id;
+        }
+    }
+    function saveSample(){
+        var row = $('#dg').datagrid('getSelected');
+        if(row){
+            action = 'update';
+        }else{
+            action = 'insert';
+        }
+        $('#fm').form('submit',{
+            url: '{{url_for("save_input_data")}}',
+            onSubmit: function(param){
+                param.table_name = table_name;
+                param.action = action;
+                return $(this).form('disableValidation');
+            },
+            success: function(result){
+                var result = eval('('+result+')');
+                if (result.errorMsg){
+                    $.messager.show({
+                        title: 'Error',
+                        msg: result.errorMsg
+                    });
+                } else {
+                    $('#dlg').dialog('close');        // close the dialog
+                    $('#dg').datagrid('reload');    // reload the user data
+                }
+            }
+        });
+    }
+    function destroySample(){
+        var row = $('#dg').datagrid('getSelected');
+        if (row){
+            $.messager.confirm('Confirm','您确定要删除这个样品吗?',function(r){
+                if (r){
+                    $.get('/destroy_sample',{id:row.sample_name,table:table_name,sample_time:row.time},function(result){
+                        if (result.success){
+                            $('#dg').datagrid('reload');    // reload the user data
+                        } else {
+                            $.messager.show({    // show error message
+                                title: 'Error',
+                                msg: result.errorMsg
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+</script>
+</html>

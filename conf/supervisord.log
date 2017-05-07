@@ -1,0 +1,42 @@
+2017-03-06 10:36:45,056 INFO daemonizing the supervisord process
+2017-03-06 10:36:45,057 INFO supervisord started with pid 3204
+2017-03-06 10:36:46,059 INFO spawned: 'myflask' with pid 3205
+2017-03-06 10:36:47,065 INFO success: myflask entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-03-06 10:47:48,852 INFO exited: myflask (terminated by SIGKILL; not expected)
+2017-03-06 10:47:49,855 INFO spawned: 'myflask' with pid 3313
+2017-03-06 10:47:50,858 INFO success: myflask entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-03-06 10:47:55,147 INFO exited: myflask (exit status 1; not expected)
+2017-03-06 10:47:56,149 INFO spawned: 'myflask' with pid 3318
+2017-03-06 10:47:57,152 INFO success: myflask entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-03-06 11:11:18,673 INFO exited: myflask (terminated by SIGKILL; not expected)
+2017-03-06 11:11:19,676 INFO spawned: 'myflask' with pid 3742
+2017-03-06 11:11:20,679 INFO success: myflask entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-03-06 11:14:08,202 INFO exited: myflask (terminated by SIGKILL; not expected)
+2017-03-06 11:14:09,206 INFO spawned: 'myflask' with pid 3797
+2017-03-06 11:14:10,208 INFO success: myflask entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-03-06 11:32:18,356 INFO daemonizing the supervisord process
+2017-03-06 11:32:18,356 INFO supervisord started with pid 4244
+2017-03-06 11:32:19,359 INFO spawned: 'myflask' with pid 4245
+2017-03-06 11:32:19,577 INFO exited: myflask (exit status 1; not expected)
+2017-03-06 11:32:20,579 INFO spawned: 'myflask' with pid 4250
+2017-03-06 11:32:20,823 INFO exited: myflask (exit status 1; not expected)
+2017-03-06 11:32:22,828 INFO spawned: 'myflask' with pid 4255
+2017-03-06 11:32:23,093 INFO exited: myflask (exit status 1; not expected)
+2017-03-06 11:32:26,098 INFO spawned: 'myflask' with pid 4260
+2017-03-06 11:32:26,654 INFO exited: myflask (exit status 1; not expected)
+2017-03-06 11:32:27,655 INFO gave up: myflask entered FATAL state, too many start retries too quickly
+2017-03-07 09:11:07,873 INFO exited: myflask (exit status 0; expected)
+2017-03-07 10:25:59,445 INFO daemonizing the supervisord process
+2017-03-07 10:25:59,445 INFO supervisord started with pid 14207
+2017-03-07 10:26:00,448 INFO spawned: 'myflask' with pid 14208
+2017-03-07 10:26:00,686 INFO exited: myflask (exit status 1; not expected)
+2017-03-07 10:26:01,687 INFO spawned: 'myflask' with pid 14213
+2017-03-07 10:26:01,908 INFO exited: myflask (exit status 1; not expected)
+2017-03-07 10:26:03,913 INFO spawned: 'myflask' with pid 14218
+2017-03-07 10:26:04,276 INFO exited: myflask (exit status 1; not expected)
+2017-03-07 10:26:07,279 INFO spawned: 'myflask' with pid 14223
+2017-03-07 10:26:07,560 INFO exited: myflask (exit status 1; not expected)
+2017-03-07 10:26:08,561 INFO gave up: myflask entered FATAL state, too many start retries too quickly
+2017-03-07 10:33:35,113 WARN received SIGTERM indicating exit request
+2017-03-07 10:33:35,117 WARN received SIGTERM indicating exit request
+2017-03-07 10:33:35,125 WARN received SIGTERM indicating exit request

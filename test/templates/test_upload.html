@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Basic CRUD Application</title>
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
+    <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../static/js/datagrid-filter.js"></script>
+    <style>
+        .icon-filter{
+            background: url("../static/img/filter.png") no-repeat center;
+        }
+    </style>
+    <script>
+        $(function () {
+            var dg = $('#dg').datagrid({
+                /*basic setting
+                title:'送样信息单',
+                pageination:'true',
+                rownumbers:'true',
+                url:'{{ url_for("get_table_data") }}',
+                method:'post',
+                */
+                queryParams:{
+                    name: 'send_sample_table'
+                }
+            });
+                /*
+                columns:[[
+                    {field:'project_id',title:'项目编号',width:100},
+                    {field:'sample_name',title:'样品名称',sortable:'true',width:100},
+                    {field:'species',title:'物种',width:60},
+                    {field:'extract_part',title:'提取部位',width:100},
+                    {field:'sample_number',title:'管数',width:60},
+                    {field:'comment',title:'备注',width:100},
+                    {field:'time',title:'时间',sortable:'true',width:100}
+                ]] */
+            dg.datagrid('enableFilter',[{
+                filterBtnIconCls:'icon-filter',
+                field: 'sample_number',
+                type: 'numberbox',
+                options: { precision: 1 },
+                op: ['equal', 'notequal', 'less', 'greater']
+            },{
+                field: 'volume',
+                type: 'numberbox',
+                options: { precision: 2 },
+                op: ['equal', 'notequal', 'less', 'greater']
+            },{
+                field: 'concentration',
+                type: 'numberbox',
+                options: { precision: 2 },
+                op: ['equal', 'notequal', 'less', 'greater']
+            },{
+                field: 'quantum',
+                type: 'numberbox',
+                options: { precision: 2 },
+                op: ['equal', 'notequal', 'less', 'greater']
+            }]);
+        })
+    </script>
+</head>
+<body>
+<h1>Test Upload And Render</h1>
+<!--<table id="dg" toolbar="#toolbar"></table>-->
+<table id="dg" title="送样信息表" class="easyui-datagrid" style="width:700px;height:500px"
+       url="/show_data"
+       toolbar="#toolbar" pagination="true"
+       rownumbers="true" fitColumns="true" singleSelect="true">
+    <thead>
+    <tr>
+        <th field="project_id" width="50" align="center">项目编号</th>
+        <th field="sample_name" width="50" align="center" sortable="true">样品名称</th>
+        <th field="species" width="50" align="center">物种</th>
+        <th field="extract_part" width="50" align="center">提取部位</th>
+        <th field="sample_number" width="50" align="center" sortable="true">管数</th>
+        <th field="comment" width="100" align="center">备注</th>
+        <th field="time" width="150" align="center" sortable="true">时间</th>
+    </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newSample()">新增样品</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editSample()">编辑样品</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroySample()">删除样品</a>
+</div>
+
+<div id="dlg" class="easyui-dialog" style="width:400px"
+     closed="true" buttons="#dlg-buttons">
+    <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+        <div style="margin-bottom:20px;font-size:14px;border-bottom:1px solid #ccc">样品信息</div>
+        <div style="margin-bottom:10px">
+            <input name="project_id" class="easyui-textbox" required="true" label="项目编号:" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+            <input name="sample_name" class="easyui-textbox" required="true" label="样品名称:" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+            <input name="species" class="easyui-textbox" required="true" label="物种:" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+            <input name="extract_part" class="easyui-textbox" required="true" label="提取部位:" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+            <input name="sample_number" class="easyui-textbox" required="true" label="管数:" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+            <input name="comment" class="easyui-textbox" required="true" label="备注:" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+            <input name="time" class="easyui-textbox" required="true" label="时间:" style="width:100%">
+        </div>
+    </form>
+</div>
+
+<div id="dlg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveSample()" style="width:90px">保存</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
+</div>
+<div id="uploadfile">
+    <form action="/upload_send_sample_table" method=post enctype=multipart/form-data>
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</div>
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning" style="color: red">
+    {{ message }}
+</div>
+{% endfor %}
+</body>
+<script type="text/javascript">
+    var table_name = 'send_sample_table';
+    function newSample(){
+        $('#dlg').dialog('open').dialog('center').dialog('setTitle','New Sample');
+        $('#fm').form('clear');
+        //url = '/save_sample';
+    }
+    function editSample(){
+        var row = $('#dg').datagrid('getSelected');
+        if (row){
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle','Edit Sample');
+            $('#fm').form('load',row);
+            //url = 'update_sample.php?id='+row.id;
+        }
+    }
+    function saveSample(){
+        var row = $('#dg').datagrid('getSelected');
+        if(row){
+            action = 'update';
+        }else{
+            action = 'insert';
+        }
+        $('#fm').form('submit',{
+            url: '{{url_for("save_input_data")}}',
+            onSubmit: function(param){
+                param.table_name = table_name;
+                param.action = action;
+                return $(this).form('disableValidation');
+            },
+            success: function(result){
+                var result = eval('('+result+')');
+                if (result.errorMsg){
+                    $.messager.show({
+                        title: 'Error',
+                        msg: result.errorMsg
+                    });
+                } else {
+                    $('#dlg').dialog('close');        // close the dialog
+                    $('#dg').datagrid('reload');    // reload the user data
+                }
+            }
+        });
+    }
+    function destroySample(){
+        var row = $('#dg').datagrid('getSelected');
+        if (row){
+            $.messager.confirm('Confirm','您确定要删除这个样品吗?',function(r){
+                if (r){
+                    $.get('/destroy_sample',{id:row.sample_name,table:table_name,sample_time:row.time},function(result){
+                        if (result.success){
+                            $('#dg').datagrid('reload');    // reload the user data
+                        } else {
+                            $.messager.show({    // show error message
+                                title: 'Error',
+                                msg: result.errorMsg
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+</script>
+</html>
