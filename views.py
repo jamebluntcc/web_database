@@ -1,6 +1,5 @@
 # coding=utf-8
 from flask import Flask, render_template, redirect, request, jsonify, session,url_for,flash
-from flask_script import Manager
 from datetime import timedelta
 from werkzeug.utils import secure_filename
 import interface
@@ -16,7 +15,6 @@ ALLOWED_EXTENSIONS = ['xlsx','xls']
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__),'uploads')
 
 app = Flask(__name__)
-manager = Manager(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'hard to guess string'
 app.permanent_session_lifetime = timedelta(hours=2)
@@ -175,6 +173,7 @@ def input_info():
     action = request.args.get('action')
     action = 'new' if not action else action
     project_number = request.args.get('project_number')
+    session['project_number'] = project_number
     data = interface.get_one_project_data(project_number) if project_number else {}
     manager_list = interface.get_manager_list()
 
@@ -437,7 +436,8 @@ def upload_return_table():
 @app.route('/show_data',methods = ['POST','GET'])
 def get_table_data():
     table_name = request.form.get('name')
-    if request.method == 'POST':
+    project_number = session.get('project_number') if session.get('project_number') else ''
+    if request.method == 'POST' and table_name:
         #分页
         page = request.values.get('page') if request.values.get('page') else 1
         rows = request.values.get('rows') if request.values.get('page') else 10
@@ -448,8 +448,9 @@ def get_table_data():
         data = []
         i = 0
         db = DBConn()
-        cmd = 'select * from {table} order by {sort_col} {order} limit {offset},{rows}'.format(
+        cmd = "select * from {table} where project_id = '{project_number}' order by {sort_col} {order} limit {offset},{rows}".format(
             table=table_name,
+	    project_number=project_number,
             sort_col=sort_col,
             order=order_type,
             offset=offset,
@@ -459,7 +460,7 @@ def get_table_data():
             data.append(dict(result))
             i += 1
         return jsonify({'total':i,'rows':data})
-    return redirect(url_for(table_name))
+    return redirect(request.referrer)
 
 @app.route('/save_data',methods = ['GET','POST'])
 def save_input_data():
@@ -535,4 +536,4 @@ def export_table():
     return interface.export_table_info()
 '''
 if __name__ == '__main__':
-    manager.run()
+    app.run()

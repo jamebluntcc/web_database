@@ -34,7 +34,7 @@ class DBConn(object):
     def _get_engine(self):
         engine = create_engine('mysql+pymysql://{user}:{pass_wd}@{host}/{db}?charset={charset}'.format(
             user='root',
-            pass_wd='050400',
+            pass_wd='20085966',
             host='localhost',
             db='SEQ_SAM_INFO',
             charset='utf8'),
@@ -129,7 +129,7 @@ if __name__ == '__main__':
             'project_name':u'外显子捕获建库测序',
             'cust_user':u'小麦所',
             'cust_organization':u'四川农业大学',
-            'sample_number':'100',
+            'sp_sum':'100',
             'status':u'准备送样',
             'create_time':'2017-4-17',
             'project_log':''}

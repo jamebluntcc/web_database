@@ -18,7 +18,8 @@
 --
 -- Table structure for table `dna_analysis_type`
 --
-
+CREATE DATABASE IF NOT EXISTS `SEQ_SAM_INFO`;
+USE `SEQ_SAM_INFO`;
 DROP TABLE IF EXISTS `dna_analysis_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
