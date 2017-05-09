@@ -437,7 +437,7 @@ def upload_return_table():
 @app.route('/show_data',methods = ['POST','GET'])
 def get_table_data():
     table_name = request.form.get('name')
-    if request.method == 'POST':
+    if request.method == 'POST' and table_name:
         #分页
         page = request.values.get('page') if request.values.get('page') else 1
         rows = request.values.get('rows') if request.values.get('page') else 10
@@ -459,7 +459,7 @@ def get_table_data():
             data.append(dict(result))
             i += 1
         return jsonify({'total':i,'rows':data})
-    return redirect(url_for(table_name))
+    return redirect(request.referrer)
 
 @app.route('/save_data',methods = ['GET','POST'])
 def save_input_data():
