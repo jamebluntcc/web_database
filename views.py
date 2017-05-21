@@ -304,7 +304,11 @@ def upload_quality_inspection_table():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data = interface.transfer_excel_to_json2(file_name=filepath)
-            #input to database:
+
+            if not data:
+                flash('your xlsx have more sheets!')
+                return redirect(request.referrer)
+
             table_name = interface.check_table(data[0].keys())
             if table_name != 'quality_inspection_table':
                 flash('it not {file_name},please try again!'.format(file_name='quality_inspection_table'))
@@ -332,7 +336,11 @@ def upload_send_sample_table():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data = interface.transfer_excel_to_json2(file_name=filepath)
-            #input to database:
+
+	    if not data:
+                flash('your xlsx have more sheets!')
+                return redirect(request.referrer)
+
             table_name = interface.check_table(data[0].keys())
             if table_name != 'send_sample_table':
                 flash('it not {file_name},please try again!'.format(file_name='send_sample_table'))
@@ -360,7 +368,11 @@ def upload_upmachine_table():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data = interface.transfer_excel_to_json2(file_name=filepath)
-            #input to database:
+
+            if not data:
+                flash('your xlsx have more sheets!')
+                return redirect(request.referrer)
+
             table_name = interface.check_table(data[0].keys())
             if table_name != 'up_machine_table':
                 flash('it not {file_name},please try again!'.format(file_name='up_machine_table'))
@@ -388,7 +400,11 @@ def upload_downmachine_table():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data = interface.transfer_excel_to_json2(file_name=filepath)
-            #input to database:
+
+            if not data:
+                flash('your xlsx have more sheets!')
+                return redirect(request.referrer)
+
             table_name = interface.check_table(data[0].keys())
             if table_name != 'down_machine_table':
                 flash('it not {file_name},please try again!'.format(file_name='down_machine_table'))
@@ -416,7 +432,11 @@ def upload_return_table():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data = interface.transfer_excel_to_json2(file_name=filepath)
-            #input to database:
+
+            if not data:
+                flash('your xlsx have more sheets!')
+                return redirect(request.referrer)
+
             table_name = interface.check_table(data[0].keys())
             if table_name != 'return_table':
                 flash('it not {file_name},please try again!'.format(file_name='return_table'))
@@ -435,12 +455,16 @@ def upload_return_table():
 
 @app.route('/show_data',methods = ['POST','GET'])
 def get_table_data():
+    '''
+    show data from database
+    '''
     table_name = request.form.get('name')
     project_number = session.get('project_number') if session.get('project_number') else ''
     if request.method == 'POST' and table_name:
         #分页
         page = request.values.get('page') if request.values.get('page') else 1
-        rows = request.values.get('rows') if request.values.get('page') else 10
+        # show all data
+        rows = request.values.get('rows') if request.values.get('page') else 100
         offset = (int(page) - 1) * int(rows)
         #排序
         sort_col = request.values.get('sort') if request.values.get('sort') else 'sample_name'
@@ -450,7 +474,7 @@ def get_table_data():
         db = DBConn()
         cmd = "select * from {table} where project_id = '{project_number}' order by {sort_col} {order} limit {offset},{rows}".format(
             table=table_name,
-	    project_number=project_number,
+	        project_number=project_number,
             sort_col=sort_col,
             order=order_type,
             offset=offset,
@@ -526,14 +550,25 @@ def del_select_data():
         return jsonify({'success':'true','errMsg':'error'})
     else:
         return jsonify({'success':'false','errMsg':'del fail!'})
-'''
-@app.route('/export_table_info',methods = ['GET','POST'])
-def export_table():
-    if request.method == 'POST':
-        table_name = request.form.get('table_name', None)
-        project_
 
-    return interface.export_table_info()
-'''
+@app.route('/destroy_all_sample')
+def destroy_all_sample():
+    project_number = session.get('project_number') if session.get('project_number') else ''
+    table_name = request.args.get('table')
+    db = DBConn()
+    ans = db.delete(table_name,condition_dict={'project_id':project_number})
+    if ans:
+        return jsonify({'success':'true','errMsg':'error'})
+    else:
+        return jsonify({'success':'false','errMsg':'del fail!'})
+#define 404 and 505 page:
+@app.errorhandler(404)
+def page_not_find(e):
+    return render_template('404.html'),404
+
+@app.errorhandler(500)
+def page_not_find(e):
+    return render_template('505.html'),500
+
 if __name__ == '__main__':
     app.run()
