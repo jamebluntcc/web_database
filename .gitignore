@@ -1,3 +1,5 @@
 #this is a file to avoid some files to track
 *.pyc
 static/code_img/*.gif
+uploads/*
+static/export/*

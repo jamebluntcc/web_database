@@ -461,24 +461,24 @@ def get_table_data():
     table_name = request.form.get('name')
     project_number = session.get('project_number') if session.get('project_number') else ''
     if request.method == 'POST' and table_name:
+        '''
         #分页
         page = request.values.get('page') if request.values.get('page') else 1
         # show all data
         rows = request.values.get('rows') if request.values.get('page') else 100
         offset = (int(page) - 1) * int(rows)
+        '''
         #排序
         sort_col = request.values.get('sort') if request.values.get('sort') else 'sample_name'
         order_type = request.values.get('order') if request.values.get('order') else 'asc'
         data = []
         i = 0
         db = DBConn()
-        cmd = "select * from {table} where project_id = '{project_number}' order by {sort_col} {order} limit {offset},{rows}".format(
+        cmd = "select * from {table} where project_id = '{project_number}' order by {sort_col} {order}".format(
             table=table_name,
 	        project_number=project_number,
             sort_col=sort_col,
-            order=order_type,
-            offset=offset,
-            rows=rows)
+            order=order_type)
         results = db.execute(cmd)
         for result in results:
             data.append(dict(result))

@@ -141,13 +141,13 @@ DROP TABLE IF EXISTS `down_machine_table`;
 CREATE TABLE `down_machine_table` (
   `project_id` varchar(45) NOT NULL,
   `sample_name` varchar(45) NOT NULL,
-  `sample_id` varchar(45) NOT NULL,
+  `sample_id` varchar(45) NOT NULL UNIQUE,
   `down_quant` varchar(45) DEFAULT NULL,
   `reads` varchar(45) DEFAULT NULL,
   `q30` varchar(45) DEFAULT NULL,
   `comment` varchar(45) DEFAULT NULL,
-  `time` date NOT NULL,
-  PRIMARY KEY (`sample_name`,`time`)
+  `time` varchar(45) NOT NULL,
+  PRIMARY KEY (`sample_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -171,7 +171,7 @@ DROP TABLE IF EXISTS `quality_inspection_table`;
 CREATE TABLE `quality_inspection_table` (
   `project_id` varchar(45) NOT NULL,
   `sample_name` varchar(45) NOT NULL,
-  `sample_id` varchar(45) DEFAULT NULL,
+  `sample_id` varchar(45) NOT NULL UNIQUE,
   `od_260_or_230` varchar(45) DEFAULT NULL,
   `od_260_or_280` varchar(45) DEFAULT NULL,
   `25S_or_18S` varchar(45) DEFAULT NULL,
@@ -182,8 +182,8 @@ CREATE TABLE `quality_inspection_table` (
   `database_type` varchar(45) DEFAULT NULL,
   `judgeresult` varchar(1) DEFAULT 'A',
   `comment` varchar(45) DEFAULT NULL,
-  `time` date NOT NULL,
-  PRIMARY KEY (`sample_name`,`time`)
+  `time` varchar(45) NOT NULL,
+  PRIMARY KEY (`sample_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -210,7 +210,7 @@ CREATE TABLE `return_table` (
   `species` varchar(45) DEFAULT NULL,
   `surplus` varchar(45) DEFAULT NULL,
   `comment` varchar(45) DEFAULT NULL,
-  `time` date NOT NULL,
+  `time` varchar(45) NOT NULL,
   PRIMARY KEY (`sample_name`,`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -480,7 +480,7 @@ CREATE TABLE `send_sample_table` (
   `extract_part` varchar(45) NOT NULL,
   `sample_number` int(11) DEFAULT '1',
   `comment` varchar(100) DEFAULT NULL,
-  `time` date NOT NULL,
+  `time` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -505,13 +505,13 @@ DROP TABLE IF EXISTS `up_machine_table`;
 CREATE TABLE `up_machine_table` (
   `project_id` varchar(45) NOT NULL,
   `sample_name` varchar(45) NOT NULL,
-  `sample_id` varchar(45) DEFAULT NULL,
+  `sample_id` varchar(45) NOT NULL UNIQUE,
   `upmachine_type` varchar(45) DEFAULT NULL,
   `upmachine_mode` varchar(45) DEFAULT NULL,
   `up_quant` varchar(45) DEFAULT NULL,
   `comment` varchar(45) DEFAULT NULL,
-  `time` date NOT NULL,
-  PRIMARY KEY (`sample_name`,`time`)
+  `time` varchar(45) NOT NULL,
+  PRIMARY KEY (`sample_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -559,7 +559,7 @@ CREATE TABLE `user_info` (
 
 LOCK TABLES `user_info` WRITE;
 /*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
-INSERT INTO `user_info` VALUES (1,'admin','陈诚','admin','29155259@qq.com','18583994795','onmath',24,'','manager','2017-04-17 18:10:30','2017-04-26 16:35:21','Y','programmer','');
+INSERT INTO `user_info` VALUES (1,'admin','陈诚','admin','29155259@qq.com','18583994795','onmath',24,'','manager','2017-04-17 18:10:30','2017-04-26 16:35:21','Y','programmer',''),(2,'YYF','杨宇凡','123','','','','','','manager','','','Y','','');
 /*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
