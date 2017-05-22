@@ -561,6 +561,27 @@ def destroy_all_sample():
         return jsonify({'success':'true','errMsg':'error'})
     else:
         return jsonify({'success':'false','errMsg':'del fail!'})
+'''
+2017-05-22 add destroy_select_sample route
+'''
+@app.route('/destroy_select_sample')
+def destroy_select_sample():
+    project_number = session.get('project_number') if session.get('project_number') else ''
+    table_name = request.args.get('table')
+    selected_samples = request.args.get('id')
+    selected_samples_list = selected_samples.split(',')
+    db = DBConn()
+    if table_name == 'send_sample_table':
+        for sample in selected_samples_list:
+            ans = db.delete(table_name,condition_dict={'id':sample})
+    else:
+        for sample in selected_samples_list:
+            ans = db.delete(table_name,condition_dict={'sample_id':sample})
+
+    if ans:
+        return jsonify({'success':'true','errMsg':'error'})
+    else:
+        return jsonify({'success':'false','errMsg':'del fail!'})
 #define 404 and 505 page:
 @app.errorhandler(404)
 def page_not_find(e):

@@ -26,7 +26,8 @@
       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newSample()">新增样品</a>
       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editSample()">编辑样品</a>
       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroySample()">删除样品</a>
-      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyAllSample()">删除表格</a>
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyAllSample()">删除整个表格</a>
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroySelectSample()">删除已选择表格</a>
   </div>
   <div id="dlg" class="easyui-dialog" style="width:400px" closed="true" buttons="#dlg-buttons">
     {% block table_form %}
@@ -114,6 +115,32 @@
     }
     function destroyAllSample(){
       $.get('/destroy_all_sample',{table:table_name},function(result){
+        if(result.success){
+          $('#dg').datagrid('reload');
+        }else{
+          $.message.show({
+            title:'Error',
+            msg:result.errorMsg
+          });
+        }
+      });
+    }
+
+    function destroySelectSample(){
+      var selected = $('#dg').datagrid('getSelections');
+      if(selected.length == 0){
+        alert('请选择要删除的样品!');
+        return;
+      }
+      var idString = "";
+      $.each(selected,function(index,item){
+        if(table_name == 'send_sample_table'){
+          idString += items.id + ',';
+        }else{
+          idString += items.sample_id + ',';
+        }
+      })
+      $.get('/destroy_select_sample',{table:table_name,id:idString},function(result){
         if(result.success){
           $('#dg').datagrid('reload');
         }else{
