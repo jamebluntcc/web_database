@@ -24,9 +24,10 @@
 <table id="dg" title="返样信息表" class="easyui-datagrid"
        url="/show_data"
        toolbar="#toolbar"
-       rownumbers="true" fitColumns="true" singleSelect="true">
+       rownumbers="true" fitColumns="true" singleSelect="true" idField="sample_id">
     <thead>
     <tr>
+        <th field="ck" checkbox="true"></th>
         <th field="project_id" width="50" align="center">项目编号</th>
         <th field="sample_name" width="50" align="center" sortable="true">样品名称</th>
         <th field="sample_id" width="50" align="center" sortable="true">样品编号</th>

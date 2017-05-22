@@ -589,7 +589,7 @@ def page_not_find(e):
 
 @app.errorhandler(500)
 def page_not_find(e):
-    return render_template('505.html'),500
+    return render_template('500.html'),500
 
 if __name__ == '__main__':
     app.run()

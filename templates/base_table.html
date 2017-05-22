@@ -135,13 +135,14 @@
       var idString = "";
       $.each(selected,function(index,item){
         if(table_name == 'send_sample_table'){
-          idString += items.id + ',';
+          idString += item.id + ',';
         }else{
-          idString += items.sample_id + ',';
+          idString += item.sample_id + ',';
         }
       })
       $.get('/destroy_select_sample',{table:table_name,id:idString},function(result){
         if(result.success){
+          $("#tbList").datagrid("clearSelections");
           $('#dg').datagrid('reload');
         }else{
           $.message.show({
