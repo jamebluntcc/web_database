@@ -3,3 +3,6 @@
 static/code_img/*.gif
 uploads/*
 static/export/*
+*.xml
+*.~
+*.pyc

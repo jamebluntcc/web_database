@@ -719,4 +719,4 @@ def page_not_find(e):
 def page_not_find(e):
     return render_template('500.html'),500
 if __name__ == '__main__':
-    app.run('192.168.0.117')
+    app.run()
