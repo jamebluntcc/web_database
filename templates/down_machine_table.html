@@ -40,6 +40,7 @@
     <thead>
     <tr>
         <th field="ck" checkbox="true"></th>
+        <th field="id" width="50" align="center">序号</th>
         <th field="project_id" width="50" align="center">项目编号</th>
         <th field="sample_name" width="50" align="center" sortable="true">样品名称</th>
         <th field="sample_id" width="50" align="center" sortable="true">样品编号</th>
@@ -58,6 +59,9 @@
 {% block table_form %}
 <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
     <div style="margin-bottom:20px;font-size:14px;border-bottom:1px solid #ccc">下机信息</div>
+    <div style="margin-bottom:10px">
+        <input name="id" class="easyui-textbox" required="true" label="序号:" style="width:100%">
+    </div>
     <div style="margin-bottom:10px">
         <input name="project_id" class="easyui-textbox" required="true" label="项目编号:" style="width:100%">
     </div>

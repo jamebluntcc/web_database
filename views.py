@@ -266,6 +266,7 @@ def get_project_files():
 
 '''
 add five tables by chencheng on 2017-04-24
+add a new module:up_down_compare_table by chencheng on 2017-05-23
 '''
 url_map = {'/send_sample_table':'send_sample_table.html',
            '/quality_inspection_table':'quality_inspection_table.html',
@@ -275,23 +276,54 @@ url_map = {'/send_sample_table':'send_sample_table.html',
 
 @app.route('/send_sample_table')
 def send_sample_table():
-    return render_template('send_sample_table.html')
+    #show summary
+    project_number = session.get('project_number')
+    results = interface.show_summary('send_sample_table',project_number)
+    return render_template('send_sample_table.html',distinct_results = results,project_number=project_number)
 
 @app.route('/quality_inspection_table')
 def quality_inspection_table():
-    return render_template('quality_inspection_table.html')
+    project_number = session.get('project_number')
+    results = interface.show_summary('quality_inspection_table',project_number)
+    return render_template('quality_inspection_table.html',distinct_results = results,project_number=project_number)
 
 @app.route('/up_machine_table')
 def up_machine_table():
-    return render_template('up_machine_table.html')
+    project_number = session.get('project_number')
+    results = interface.show_summary('up_machine_table',project_number)
+    return render_template('up_machine_table.html',distinct_results = results,project_number=project_number)
 
 @app.route('/down_machine_table')
 def down_machine_table():
-    return render_template('down_machine_table.html')
+    project_number = session.get('project_number')
+    results = interface.show_summary('down_machine_table',project_number)
+    return render_template('down_machine_table.html',distinct_results = results,project_number=project_number)
 
+@app.route('/up_down_compare_table')
+def up_down_compare_table():
+    project_number = session.get('project_number')
+    return render_template('updown_compare_table.html',project_number=project_number)
+
+@app.route('/show_up_down_compare',methods = ['GET','POST'])
+def show_up_down_compare():
+    if request.method == 'POST':
+        project_number = session.get('project_number')
+    #tranfer list to dict:
+        compare_title = ['project_id','sample_name','sample_id','upmachine_time','downmachine_time','down_quant']
+        merge_list = interface.compare_table_data(project_number)
+        data = []
+        i = 0
+        for each in merge_list:
+            data.append(dict(zip(compare_title,each)))
+            i += 1
+
+        return jsonify({'total':i,'rows':data})
+    return redirect(request.referrer)
 @app.route('/return_table')
 def return_table():
-    return render_template('return_table.html')
+    project_number = session.get('project_number')
+    results = interface.show_summary('return_table',project_number)
+    return render_template('return_table.html',project_number=project_number)
 #upload five files to database:
 @app.route('/upload_quality_inspection_table',methods=['GET','POST'])
 def upload_quality_inspection_table():
@@ -313,10 +345,23 @@ def upload_quality_inspection_table():
             if table_name != 'quality_inspection_table':
                 flash('it not {file_name},please try again!'.format(file_name='quality_inspection_table'))
                 return redirect(request.referrer)
-
+            #get upload times
             db = DBConn()
+            '''
+            project_number = session.get('project_number') if session.get('project_number') else ''
+            cmd = "select quality_inspection_table from count_upload_time_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            upload_times = int(result[0])
+            '''
+            #always insert!
             for each_record in data:
                 db.insert('quality_inspection_table',each_record)
+            #count the upload times
+            '''
+            upload_times += 1
+            cmd = "update count_upload_time_table set quality_inspection_table = '{upload_times}' where 'project_id' = {project_number}".format(project_number=project_number,upload_times=upload_times)
+            result = db.execute(cmd)
+            '''
             return redirect(request.referrer)
         elif file == '':
             flash('no select file!')
@@ -347,8 +392,19 @@ def upload_send_sample_table():
                 return redirect(request.referrer)
 
             db = DBConn()
+            '''
+            project_number = session.get('project_number') if session.get('project_number') else ''
+            cmd = "select send_sample_table from count_upload_time_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            upload_times = int(result[0])
+            '''
             for each_record in data:
                 db.insert('send_sample_table',each_record)
+            '''
+            upload_times += 1
+            cmd = "update count_upload_time_table set send_sample_table='{upload_times}' where 'project_id' = {project_number}".format(project_number=project_number,upload_times=upload_times)
+            result = db.execute(cmd)
+            '''
             return redirect(request.referrer)
         elif file == '':
             flash('no select file!')
@@ -379,8 +435,19 @@ def upload_upmachine_table():
                 return redirect(request.referrer)
 
             db = DBConn()
+            '''
+            project_number = session.get('project_number') if session.get('project_number') else ''
+            cmd = "select up_machine_table from count_upload_time_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            upload_times = int(result[0])
+            '''
             for each_record in data:
                 db.insert('up_machine_table',each_record)
+            '''
+            upload_times += 1
+            cmd = "update count_upload_time_table set up_machine_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            '''
             return redirect(request.referrer)
         elif file == '':
             flash('no select file!')
@@ -411,8 +478,19 @@ def upload_downmachine_table():
                 return redirect(request.referrer)
 
             db = DBConn()
+            '''
+            project_number = session.get('project_number') if session.get('project_number') else ''
+            cmd = "select down_machine_table from count_upload_time_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            upload_times = int(result[0])
+            '''
             for each_record in data:
                 db.insert('down_machine_table',each_record)
+            '''
+            upload_times += 1
+            cmd = "update count_upload_time_table set down_machine_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            '''
             return redirect(request.referrer)
         elif file == '':
             flash('no select file!')
@@ -443,8 +521,62 @@ def upload_return_table():
                 return redirect(request.referrer)
 
             db = DBConn()
+            '''
+            project_number = session.get('project_number') if session.get('project_number') else ''
+            cmd = "select return_table from count_upload_time_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            upload_times = int(result[0])
+            '''
             for each_record in data:
                 db.insert('return_table',each_record)
+            '''
+            upload_times += 1
+            cmd = "update count_upload_time_table set return_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            '''
+            return redirect(request.referrer)
+        elif file == '':
+            flash('no select file!')
+            return  redirect(request.referrer)
+        else:
+            flash('only .xls or .xlsx file required!')
+            return redirect(request.referrer)
+
+@app.route('/upload_up_down_compare_table',methods=['GET','POST'])
+def upload_updown_compare_table():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and interface.allow_files(file.filename):
+            filename = secure_filename(file.filename)
+            if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                os.makedirs(app.config['UPLOAD_FOLDER'])
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            data = interface.transfer_excel_to_json2(file_name=filepath)
+
+            if not data:
+                flash('your xlsx have more sheets!')
+                return redirect(request.referrer)
+
+            table_name = interface.check_table(data[0].keys())
+            if table_name != 'return_table':
+                flash('it not {file_name},please try again!'.format(file_name='return_table'))
+                return redirect(request.referrer)
+
+            db = DBConn()
+            '''
+            project_number = session.get('project_number') if session.get('project_number') else ''
+            cmd = "select up_down_compare_table from count_upload_time_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            upload_times = int(result[0])
+            '''
+            for each_record in data:
+                db.insert('up_down_compare_table',each_record)
+            '''
+            upload_times += 1
+            cmd = "update count_upload_time_table set up_down_compare_table where 'project_id' = {project_number}".format(project_number=project_number)
+            result = db.execute(cmd)
+            '''
             return redirect(request.referrer)
         elif file == '':
             flash('no select file!')
@@ -495,22 +627,26 @@ def save_input_data():
         send_sample_table_dict = dict.fromkeys(['id','project_id','sample_name',
                                          'species','extract_part',
                                          'sample_number','comment','time'])
-        quality_inspection_table_dict = dict.fromkeys(['project_id','sample_name','sample_id',
+        quality_inspection_table_dict = dict.fromkeys(['id','project_id','sample_name','sample_id',
                                                        'od_260_or_230','od_260_or_280','25S_or_18S',
                                                        'rin','volume','concentration','quantum',
                                                        'database_type','judgeresult','comment','time'])
-        up_machine_table_dict = dict.fromkeys(['project_id','sample_name',
+        up_machine_table_dict = dict.fromkeys(['id','project_id','sample_name',
                                                'upmachine_type','upmachine_mode','up_quant',
                                                'comment','time'])
-        down_machine_table_dict = dict.fromkeys(['project_id','sample_name','sample_id','down_quant',
+        down_machine_table_dict = dict.fromkeys(['id','project_id','sample_name','sample_id','down_quant',
                                                  'reads','q30','comment','time'])
-        return_table_dict = dict.fromkeys(['project_id','sample_name','species','surplus','comment','time'])
+        return_table_dict = dict.fromkeys(['id','project_id','sample_name','species','surplus','comment','time'])
+        up_down_compare_table_dict = dict.fromkeys(['id','project_id','sample_name','sample_id','upmachine_time',
+                                                    'downmachine_time','down_quant','comment'])
+
 
         all_table_dicts = dict(send_sample_table=send_sample_table_dict,
                                quality_inspection_table=quality_inspection_table_dict,
                                up_machine_table=up_machine_table_dict,
                                down_machine_table=down_machine_table_dict,
-                               return_table=return_table_dict)
+                               return_table=return_table_dict,
+                               up_down_compare_table=up_down_compare_table_dict)
 
         send_sample_row = None
         for each_table,table_content in all_table_dicts.items():
@@ -524,15 +660,7 @@ def save_input_data():
             db.insert(table_name, send_sample_row)
             return jsonify({'success': 'true', 'errMsg': 'error'})
         elif action == 'update' and send_sample_row:
-            if table_name == 'send_sample_table':
-                db.update(table_name,
-                          condition_dict={'id':send_sample_row['id']},
-                          update_dict=send_sample_row)
-            else:
-                db.update(table_name,
-                          condition_dict={'sample_id':send_sample_row['sample_id']},
-                          update_dict=send_sample_row)
-
+            db.update(table_name,condition_dict={'id':send_sample_row['id']},update_dict=send_sample_row)
             return jsonify({'success': 'true', 'errMsg': 'error'})
         else:
             return jsonify({'success': 'false', 'errMsg': 'error'})
@@ -582,7 +710,7 @@ def destroy_select_sample():
         return jsonify({'success':'true','errMsg':'error'})
     else:
         return jsonify({'success':'false','errMsg':'del fail!'})
-#define 404 and 505 page:
+#define 404 and 500 page:
 @app.errorhandler(404)
 def page_not_find(e):
     return render_template('404.html'),404
@@ -590,6 +718,5 @@ def page_not_find(e):
 @app.errorhandler(500)
 def page_not_find(e):
     return render_template('500.html'),500
-
 if __name__ == '__main__':
-    app.run()
+    app.run('192.168.0.117')

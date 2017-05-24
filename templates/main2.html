@@ -330,7 +330,7 @@
         $("#show_all").jqGrid({
             datatype: 'local',
             height: 250,
-            colNames: ['项目编号', '项目名称', '客户单位', '客户名称', '项目状态' ,'创建时间', '', ''],
+            colNames: ['项目编号', '项目名称', '客户单位', '客户名称', '项目状态' ,'创建时间','最近修改','',''],
             colModel: [
                 { name: 'project_number', index: 'project_number', width: 65, editable:false},
                 { name: 'project_name', index: 'project_name', width: 65, editable:false},
@@ -338,6 +338,7 @@
                 { name: 'cust_user', index: 'cust_user', width: 65, editable:false},
                 { name: 'status', index: 'status', width: 80, editable:true, edittype:'select',editoptions:{value:status_list,maxLength:20}},
                 { name: 'create_time', index: 'create_time', width: 65, editable:false},
+                { name: 'change_time', index: 'change_time', width: 65, editable:false},
                 { name: 'save', index: 'save', width: 120, editable:false},
                 { name: 'action', index: 'action', width: 120, hidden: false, formatter:format_upload_button}
             ],

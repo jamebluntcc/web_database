@@ -56,7 +56,7 @@ def save_info(all_info, username, action='new'):
     except Exception, e:
         print e
         return {'data': '', 'errcode': 1, 'msg': '保存失败！项目编号已经存在，请另外选择项目编号。'}
-
+    project_number = all_info['sample_project_master_info']['project_number']
     del all_info['sample_project_master_info']
     for key in all_info.keys():
         table_name = key.replace('_info', '')
@@ -66,7 +66,12 @@ def save_info(all_info, username, action='new'):
              db_instance.update(table_name, {'id': project_id}, data_info)
         else:
              db_instance.insert(table_name, data_info)
-
+    #init count_upload_time_table
+    '''
+    if action is not 'update':
+        init_data = {'project_id':project_number}
+        db_instance.insert('count_upload_time_table',{})
+    '''
     msg = '更新成功！' if action == 'update' else '保存成功!'
     return {'data': '', 'errcode': 0, 'msg': msg}
 
@@ -102,10 +107,11 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
     if action == 'update':
         cmd = "select id from sample_project_master where project_number='%s'" % data_info['project_number']
         result = db_instance.execute(cmd, get_all=False)
-        preject_id = result[0] #return id
+        project_id = result[0] #return id
+        data_info['change_time'] = "%s" % (time) #add last change time
         data_info['project_log'] += "\n%s: %s update this project.\n" % (time, username)
-        db_instance.update('sample_project_master', {'id': preject_id}, data_info)
-        return preject_id
+        db_instance.update('sample_project_master', {'id': project_id}, data_info)
+        return project_id
     else:
         data_info['created_by'] = username
         data_info['create_time'] = datetime.datetime.now()
@@ -115,7 +121,7 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
 
 def show_all_data(username, role='user'):
     data = []
-    cmd = """select project_number,project_name,cust_organization,cust_user,status,create_time
+    cmd = """select project_number,project_name,cust_organization,cust_user,status,create_time,change_time,project_log
             from sample_project_master spm where
           """
     if role == 'manager':
@@ -552,6 +558,117 @@ def check_table(table_title):
     else:
         table_name = None
     return table_name
+
+def show_summary(table_name,project_number):
+    db = DBConn()
+    all_distinct_cmd = []
+    all_results_list = []
+    cmd_sample_name = "select distinct(sample_name) from {table_name} where project_id='{project_number}'".format(table_name=table_name,project_number=project_number)
+    cmd_time = "select distinct(time) from {table_name} where project_id='{project_number}'".format(table_name=table_name,project_number=project_number)
+    all_distinct_cmd.extend([cmd_sample_name,cmd_time])
+
+    if table_name is not 'send_sample_table' and table_name is not 'return_table':
+        cmd_sample_id = "select distinct(sample_id) from {table_name} where project_id='{project_number}'".format(table_name=table_name,project_number=project_number)
+        all_distinct_cmd.append(cmd_sample_id)
+
+    for each_cmd in all_distinct_cmd:
+        results = db.execute(each_cmd)
+        results = [i[0] for i in results]
+        str_results = ','.join(results)
+        all_results_list.append(str_results)
+
+    return all_results_list
+'''
+up_machine_table and down_machine_table compare and merge
+write by chencheng on 2017-05-24
+'''
+def findrow_byid(sample_id,row):
+    sample_id_list = [i[1] for i in row]
+    index = sample_id_list.index(sample_id)
+    return row[index]
+
+def cmp_time(a,b):
+    a_datetime = datetime.datetime.strptime(a,'%Y-%m-%d')
+    b_datetime = datetime.datetime.strptime(b,'%Y-%m-%d')
+    if a_datetime > b_datetime:
+        return 1
+    elif a_datetime < b_datetime:
+        return -1
+    else:
+        return 0
+
+def list2dict(repeat_list):
+    id_repeat = list(set([i[1] for i in repeat_list]))
+    repeat_dict = dict.fromkeys(id_repeat)
+    for id in id_repeat:
+        temp_list = []
+        for smaple_name,sample_id,time in repeat_list:
+            if id == sample_id:
+                # sort it by time
+                temp_list.append(time)
+                temp_list.sort(cmp = cmp_time)
+                repeat_dict[id] = temp_list
+
+    return repeat_dict
+
+def compare_table_data(project_number):
+    db = DBConn()
+    #get up_machine_data
+    cmd = "select sample_id,sample_name,time from up_machine_table where project_id='{project_number}'".format(project_number=project_number)
+    up_machine_data = db.execute(cmd)
+    #get down_machine_data
+    cmd = "select sample_id,sample_name,time,down_quant from down_machine_table where project_id='{project_number}'".format(project_number=project_number)
+    down_machine_data = db.execute(cmd)
+
+    down_data_str = [['.'.join(k[:3]),list(k[3:])[0]] for k in down_machine_data] #return 'time.down_quant'
+    up_no_repeat_list = []
+    up_repeat_list = []
+    down_repeat_list = []
+
+    up_sample_id_list = [i[1] for i in up_machine_data]
+    down_sample_id_list = [i[1] for i in down_machine_data]
+    for sample_name,sample_id,time in up_machine_data:
+        if up_sample_id_list.count(sample_id) > 1:
+            up_repeat_list.append([sample_name,sample_id,time])
+        else:
+            up_no_repeat_list.append([sample_name,sample_id,time])
+
+    for sample_name,sample_id,time,down_quant in down_machine_data:
+        if down_sample_id_list.count(sample_id) > 1:
+            down_repeat_list.append([sample_name,sample_id,time])
+
+    #deal no repeat
+    up_data_id = [i[1] for i in up_no_repeat_list]
+    merge_data = []
+    for id in up_data_id:
+        if id in down_sample_id_list:
+            up_list = list(findrow_byid(id,up_machine_data))
+            down_list = list(findrow_byid(id,down_machine_data)[2:])
+            up_list.extend(down_list)
+            merge_data.append(up_list)
+        else:
+            up_list = list(findrow_byid(id,up_machine_data))
+            up_list.extend(['',''])
+            merge_data.append(up_list)
+    #deal repeat
+    up_dict = list2dict(up_repeat_list)
+    down_dict = list2dict(down_repeat_list)
+
+    for sample_id,time_list in up_dict.items():
+        sample_name = findrow_byid(sample_id,up_machine_data)[0]
+        down_time = down_dict[sample_id]
+        for up_each_time,down_each_time in zip(time_list,down_time):
+            down_quant = [k[1] for k in down_data_str if k[0] == '.'.join([sample_name,sample_id,down_each_time])][0]
+            merge_data.append([sample_name,sample_id,up_each_time,down_each_time,down_quant])
+        if len(time_list) > len(down_time):
+            redundant_list = time_list[len(time_list):]
+            for each in redundant_list:
+                merge_data.append([sample_name,sample_id,each,'',''])
+    #add project_number
+    for k in merge_data:
+        k.insert(0,project_number)
+    #tranfer list to dict:
+    return merge_data
 
 
 if __name__ == '__main__':

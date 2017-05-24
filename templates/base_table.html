@@ -7,6 +7,7 @@
   <link rel="stylesheet" type="text/css" href="/static/css/easyui/icon.css">
   <link rel="stylesheet" type="text/css" href="/static/css/easyui/color.css">
   <link rel="stylesheet" type="text/css" href="/static/css/easyui/main.css">
+  <link href="/static/css/bootstrap-combined.min.css" rel="stylesheet" media="screen">
   <script type="text/javascript" src="/static/js/easyui/jquery-1.6.min.js"></script>
   <script type="text/javascript" src="/static/js/easyui/easyui.min.js"></script>
   <script type="text/javascript" src="/static/js/easyui/datagrid-filter.js"></script>
@@ -19,7 +20,23 @@
   {% endblock %}
 </head>
 <body>
-  <h1>{% block tablename %}{% endblock %}</h1>
+  <div class="header clearfix">
+      <nav>
+          <ul class="nav nav-pills pull-right">
+              <li role="presentation"><a href="/">返回主页</a></li>
+              <li role="presentation"><a href="/input_info?action=update&project_number={{project_number}}">返回建库测序信息单</a></li>
+          </ul>
+      </nav>
+      <h3 class="text-muted">{% block tablename %}{% endblock %}</h3>
+  </div>
+    <div id="win" class="easyui-window" title="筛选重复项" closed="true" style="width:300px;height:100px;padding:5px;">
+      {% for result in distinct_results %}
+          {{ result }}
+          <br>
+          <br>
+          <br>
+      {% endfor %}
+    </div>
   {% block table_html_init %}
   {% endblock %}
   <div id="toolbar">
@@ -28,6 +45,7 @@
       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroySample()">删除样品</a>
       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyAllSample()">删除整个表格</a>
       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroySelectSample()">删除已选择表格</a>
+      <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="showSummary()">显示数据统计</a>
   </div>
   <div id="dlg" class="easyui-dialog" style="width:400px" closed="true" buttons="#dlg-buttons">
     {% block table_form %}
@@ -151,6 +169,9 @@
           });
         }
       });
+    }
+    function showSummary(){
+      $('#win').window('open');
     }
 </script>
 </html>

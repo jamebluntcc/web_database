@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>上下机信息对比表</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/icon.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/color.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/easyui/main.css">
+  <link href="/static/css/bootstrap-combined.min.css" rel="stylesheet" media="screen">
+  <script type="text/javascript" src="/static/js/easyui/jquery-1.6.min.js"></script>
+  <script type="text/javascript" src="/static/js/easyui/easyui.min.js"></script>
+  <script type="text/javascript" src="/static/js/easyui/datagrid-filter.js"></script>
+  <style>
+      .icon-filter{
+          background: url("../static/img/filter.png") no-repeat center;
+      }
+  </style>
+  <script>
+      $(function () {
+          var dg = $('#dg').datagrid({
+            url:'{{url_for('show_up_down_compare')}}'
+            });
+          dg.datagrid('enableFilter',[{
+              filterBtnIconCls:'icon-filter',
+              field: 'down_quant',
+              type: 'numberbox',
+              options: { precision: 2 },
+              op: ['equal', 'notequal', 'less', 'greater']
+          }]);
+      })
+  </script>
+</head>
+<body>
+  <div class="header clearfix">
+      <nav>
+          <ul class="nav nav-pills pull-right">
+              <li role="presentation"><a href="/">返回主页</a></li>
+              <li role="presentation"><a href="/input_info?action=update&project_number={{project_number}}">返回建库测序信息单</a></li>
+          </ul>
+      </nav>
+      <h3 class="text-muted">上下机信息对比表</h3>
+  </div>
+    <table id="dg" title="上下机信息对比表" class="easyui-datagrid"
+           toolbar="#toolbar"
+           rownumbers="true" fitColumns="true" idField="id">
+        <thead>
+        <tr>
+            <th field="project_id" width="50" align="center">项目编号</th>
+            <th field="sample_name" width="50" align="center" sortable="true">样品名称</th>
+            <th field="sample_id" width="50" align="center">样品编号</th>
+            <th field="upmachine_time" width="150" align="center">上机时间</th>
+            <th field="downmachine_time" width="150" align="center">下机时间</th>
+            <th field="down_quant" width="50" align="center">下机数据量</th>
+        </tr>
+        </thead>
+    </table>
+  <div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning" style="color:red"><span>{{ message }}</span></div>
+    {% endfor %}
+  </div>
+</body>
+</html>
